@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulado - Assistente de Tecnologia da Informação</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .correct-answer {
+            background-color: #dcfce7; /* green-100 */
+            border-left: 4px solid #22c55e; /* green-500 */
+        }
+        .wrong-answer {
+            background-color: #fee2e2; /* red-100 */
+            border-left: 4px solid #ef4444; /* red-500 */
+        }
+        .selected-answer.correct-answer {
+             background-color: #dcfce7;
+        }
+        .no-selection {
+            border-left: 4px solid #facc15; /* yellow-400 */
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-4xl">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-bold text-slate-900">Simulado - Assistente de TI</h1>
+            <p class="mt-2 text-slate-600">Teste seus conhecimentos para a avaliação.</p>
+        </header>
+
+        <form id="quiz-form" class="space-y-8">
+            <!-- As perguntas serão inseridas aqui pelo JavaScript -->
+        </form>
+
+        <div id="results-container" class="mt-10 text-center">
+            <button id="submit-btn" class="w-full sm:w-auto bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 transition-colors duration-300 shadow-md">
+                Exibir Resultado
+            </button>
+            <div id="score-display" class="hidden mt-6 text-2xl font-bold bg-white p-6 rounded-lg shadow-lg"></div>
+            <div id="export-buttons" class="hidden mt-6 space-y-3 sm:space-y-0 sm:space-x-4">
+                 <button id="export-questions-btn" class="w-full sm:w-auto bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition-colors duration-300">
+                    Exportar Perguntas e Gabarito
+                </button>
+                <button id="export-score-btn" class="w-full sm:w-auto bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition-colors duration-300">
+                    Exportar Pontuação
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            // Língua Portuguesa
+            {
+                category: "Língua Portuguesa",
+                question: "Assinale a alternativa em que a palavra é acentuada pela mesma regra de 'tecnológica'.",
+                options: ["Bônus", "História", "Saúde", "Análise"],
+                answer: 3
+            },
+            {
+                category: "Língua Portuguesa",
+                question: "Em 'Os analistas entregaram o relatório ao gerente', qual é o núcleo do sujeito?",
+                options: ["Relatório", "Gerente", "Analistas", "Entregaram"],
+                answer: 2
+            },
+            {
+                category: "Língua Portuguesa",
+                question: "Qual frase apresenta o uso INCORRETO da crase?",
+                options: ["Fui à Bahia nas férias.", "O projeto foi entregue à diretora.", "Começou a chover forte.", "O acesso à informação é um direito."],
+                answer: 2
+            },
+            {
+                category: "Língua Portuguesa",
+                question: "Em 'O tempo, senhor da razão, resolve tudo', a expressão 'senhor da razão' funciona como:",
+                options: ["Aposto", "Vocativo", "Predicativo do sujeito", "Objeto direto"],
+                answer: 0
+            },
+            {
+                category: "Língua Portuguesa",
+                question: "Qual das alternativas apresenta um exemplo de concordância verbal correta?",
+                options: ["Houveram muitos problemas no sistema.", "Fazem dois anos que trabalho aqui.", "A maioria dos usuários preferiu a nova interface.", "Vende-se casas novas no bairro."],
+                answer: 2
+            },
+             {
+                category: "Língua Portuguesa",
+                question: "A separação silábica da palavra 'protocolo' resulta em quantos fonemas?",
+                options: ["9 fonemas", "8 fonemas", "10 fonemas", "7 fonemas"],
+                answer: 1
+            },
+            {
+                category: "Língua Portuguesa",
+                question: "Qual o sinônimo da palavra 'obsoleto'?",
+                options: ["Antigo", "Moderno", "Inovador", "Atual"],
+                answer: 0
+            },
+            {
+                category: "Língua Portuguesa",
+                question: "A frase 'O computador é uma ferramenta útil' apresenta qual figura de linguagem?",
+                options: ["Metáfora", "Comparação", "Personificação", "Hipérbole"],
+                answer: 0
+            },
+            {
+                category: "Língua Portuguesa",
+                question: "Qual a regência correta do verbo 'assistir' no sentido de 'ver'?",
+                options: ["Assisti o filme.", "Assisti ao filme.", "Assisti no filme.", "Assisti pelo filme."],
+                answer: 1
+            },
+            {
+                category: "Língua Portuguesa",
+                question: "Qual a função da pontuação na frase 'O aluno, que era estudioso, passou no exame'?",
+                options: ["Indicar uma pausa para respiração.", "Separar o sujeito do predicado.", "Isolar uma oração subordinada adjetiva explicativa.", "Enfatizar a palavra 'aluno'."],
+                answer: 2
+            },
+            // Matemática
+            {
+                category: "Matemática",
+                question: "Se um produto que custava R$ 250,00 sofreu um aumento de 12%, qual é o seu novo preço?",
+                options: ["R$ 270,00", "R$ 280,00", "R$ 290,00", "R$ 300,00"],
+                answer: 1
+            },
+            {
+                category: "Matemática",
+                question: "Qual dos seguintes números é irracional?",
+                options: ["√49", "3.14", "π (Pi)", "10/3"],
+                answer: 2
+            },
+            {
+                category: "Matemática",
+                question: "Um técnico digita 15 páginas em 2 horas. Mantendo o mesmo ritmo, quantas páginas ele digitará em 6 horas?",
+                options: ["30 páginas", "40 páginas", "45 páginas", "50 páginas"],
+                answer: 2
+            },
+            {
+                category: "Matemática",
+                question: "A solução da equação de 1º grau '3x - 15 = 6' é:",
+                options: ["x = 5", "x = 7", "x = 9", "x = -3"],
+                answer: 1
+            },
+            {
+                category: "Matemática",
+                question: "Dados os conjuntos A = {1, 2, 3, 4} e B = {3, 4, 5, 6}, qual é o conjunto resultante da operação A ∩ B (intersecção)?",
+                options: ["{1, 2, 5, 6}", "{1, 2, 3, 4, 5, 6}", "{3, 4}", "{1, 2}"],
+                answer: 2
+            },
+            {
+                category: "Matemática",
+                question: "Qual o volume de um cubo com 5 cm de aresta?",
+                options: ["125 cm³", "150 cm³", "100 cm³", "25 cm³"],
+                answer: 0
+            },
+            {
+                category: "Matemática",
+                question: "Qual o resultado da expressão (2 + 3) * 4 - 5?",
+                options: ["15", "10", "20", "5"],
+                answer: 0
+            },
+            {
+                category: "Matemática",
+                question: "Em uma turma de 30 alunos, 18 foram aprovados. Qual a porcentagem de alunos aprovados?",
+                options: ["50%", "60%", "70%", "80%"],
+                answer: 1
+            },
+            {
+                category: "Matemática",
+                question: "Qual o próximo número da sequência 2, 5, 11, 23, ...?",
+                options: ["47", "46", "45", "44"],
+                answer: 0
+            },
+            {
+                category: "Matemática",
+                question: "Se um carro percorre 300 km com 30 litros de combustível, qual o consumo médio por litro?",
+                options: ["10 km/l", "12 km/l", "15 km/l", "20 km/l"],
+                answer: 0
+            },
+            // Conhecimentos Específicos
+            {
+                category: "Conhecimentos Específicos",
+                question: "Qual componente de um computador é considerado o 'cérebro' da máquina, responsável por executar instruções?",
+                options: ["Memória RAM", "Disco Rígido (HD/SSD)", "Placa-mãe", "Processador (CPU)"],
+                answer: 3
+            },
+            {
+                category: "Conhecimentos Específicos",
+                question: "O que significa a sigla SQL no contexto de banco de dados?",
+                options: ["Simple Query Language", "Structured Question Language", "Structured Query Language", "Standard Query Logic"],
+                answer: 2
+            },
+            {
+                category: "Conhecimentos Específicos",
+                question: "Qual dos seguintes é um exemplo de serviço de Computação em Nuvem do tipo IaaS (Infrastructure as a Service)?",
+                options: ["Gmail", "Microsoft 365", "Amazon Web Services (AWS) EC2", "Salesforce"],
+                answer: 2
+            },
+            {
+                category: "Conhecimentos Específicos",
+                question: "Qual protocolo é usado para converter nomes de domínio (como 'google.com') em endereços IP?",
+                options: ["HTTP", "FTP", "DNS", "TCP"],
+                answer: 2
+            },
+            {
+                category: "Conhecimentos Específicos",
+                question: "Um software malicioso que se replica automaticamente através de redes, sem a necessidade de um programa hospedeiro, é chamado de:",
+                options: ["Vírus", "Worm", "Trojan", "Spyware"],
+                answer: 1
+            },
+            {
+                category: "Conhecimentos Específicos",
+                question: "Qual tipo de backup copia apenas os arquivos que foram alterados desde o último backup COMPLETO?",
+                options: ["Backup Completo", "Backup Incremental", "Backup Diferencial", "Backup em Nuvem"],
+                answer: 2
+            },
+            {
+                category: "Conhecimentos Específicos",
+                question: "Qual dos seguintes é um exemplo de sistema operacional de código aberto?",
+                options: ["Windows 11", "macOS", "Linux", "iOS"],
+                answer: 2
+            },
+            {
+                category: "Conhecimentos Específicos",
+                question: "O pilar da Segurança da Informação que garante que a informação não seja alterada de forma não autorizada é a:",
+                options: ["Confidencialidade", "Disponibilidade", "Integridade", "Autenticidade"],
+                answer: 2
+            },
+            {
+                category: "Conhecimentos Específicos",
+                question: "O que é um banco de dados não relacional (NoSQL)?",
+                options: ["Um banco de dados que não usa a linguagem SQL.", "Um banco de dados que armazena dados em tabelas com linhas e colunas.", "Um banco de dados que oferece um modelo de dados flexível, não baseado em tabelas.", "Um banco de dados obsoleto e não mais utilizado."],
+                answer: 2
+            },
+            {
+                category: "Conhecimentos Específicos",
+                question: "Qual o principal objetivo de um firewall em uma rede de computadores?",
+                options: ["Aumentar a velocidade da internet.", "Filtrar o tráfego de rede para bloquear acessos não autorizados.", "Fazer backup automático dos dados.", "Detectar e remover vírus dos computadores."],
+                answer: 1
+            }
+        ];
+
+        const quizForm = document.getElementById('quiz-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const scoreDisplay = document.getElementById('score-display');
+        const exportButtons = document.getElementById('export-buttons');
+        const exportQuestionsBtn = document.getElementById('export-questions-btn');
+        const exportScoreBtn = document.getElementById('export-score-btn');
+        let currentCategory = "";
+        let score = 0;
+
+        function renderQuiz() {
+            const letters = ['A', 'B', 'C', 'D'];
+            quizData.forEach((q, index) => {
+                if(q.category !== currentCategory) {
+                    currentCategory = q.category;
+                    const categoryHeader = document.createElement('h2');
+                    categoryHeader.className = "text-2xl font-bold border-b-2 border-indigo-200 pb-2 mb-6 text-indigo-800";
+                    categoryHeader.textContent = currentCategory;
+                    quizForm.appendChild(categoryHeader);
+                }
+
+                const questionElement = document.createElement('div');
+                questionElement.className = 'question-block bg-white p-6 rounded-lg shadow-md';
+                questionElement.id = `question-${index}`;
+                
+                const questionTitle = document.createElement('p');
+                questionTitle.className = 'font-semibold text-lg mb-4';
+                questionTitle.textContent = `${index + 1}. ${q.question}`;
+                questionElement.appendChild(questionTitle);
+
+                const optionsElement = document.createElement('div');
+                optionsElement.className = 'space-y-3';
+                questionElement.appendChild(optionsElement);
+
+                q.options.forEach((option, i) => {
+                    const optionContainer = document.createElement('div');
+                    const radioInput = document.createElement('input');
+                    radioInput.type = 'radio';
+                    radioInput.name = `question${index}`;
+                    radioInput.value = i;
+                    radioInput.id = `q${index}o${i}`;
+                    radioInput.className = "sr-only peer";
+
+                    const label = document.createElement('label');
+                    label.htmlFor = `q${index}o${i}`;
+                    label.textContent = `(${letters[i]}) ${option}`;
+                    label.className = "block w-full p-3 rounded-lg border border-slate-300 cursor-pointer transition-colors duration-200 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 peer-checked:font-semibold";
+                    
+                    optionContainer.appendChild(radioInput);
+                    optionContainer.appendChild(label);
+                    optionsElement.appendChild(optionContainer);
+                });
+
+                quizForm.appendChild(questionElement);
+            });
+        }
+
+        function calculateScore() {
+            score = 0;
+            const radioInputs = document.querySelectorAll('input[type="radio"]');
+            
+            quizData.forEach((q, index) => {
+                const questionBlock = document.getElementById(`question-${index}`);
+                const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
+                const labels = questionBlock.querySelectorAll('label');
+
+                if (selectedOption) {
+                    const selectedAnswer = parseInt(selectedOption.value);
+                    const selectedLabel = selectedOption.nextElementSibling;
+
+                    if (selectedAnswer === q.answer) {
+                        score++;
+                        selectedLabel.parentElement.classList.add('correct-answer');
+                    } else {
+                        selectedLabel.parentElement.classList.add('wrong-answer');
+                        // Highlight the correct answer as well
+                        labels[q.answer].parentElement.classList.add('correct-answer');
+                    }
+                } else {
+                    // If no answer was selected, highlight the correct one
+                    labels[q.answer].parentElement.classList.add('correct-answer');
+                    questionBlock.classList.add('no-selection');
+                }
+            });
+
+            radioInputs.forEach(input => input.disabled = true);
+        }
+
+        function showResults() {
+            calculateScore();
+            const totalQuestions = quizData.length;
+            const percentage = ((score / totalQuestions) * 100).toFixed(1);
+
+            scoreDisplay.innerHTML = `Sua pontuação: <span class="text-indigo-600">${score} de ${totalQuestions}</span> (${percentage}%)`;
+            scoreDisplay.classList.remove('hidden');
+            exportButtons.classList.remove('hidden');
+            submitBtn.style.display = 'none'; // Hide the submit button
+        }
+        
+        function exportQuestions() {
+            let textContent = "Simulado - Perguntas e Gabarito\n\n";
+            const letters = ['A', 'B', 'C', 'D'];
+
+            quizData.forEach((q, index) => {
+                textContent += `----------------------------------------\n`;
+                textContent += `Categoria: ${q.category}\n`;
+                textContent += `${index + 1}. ${q.question}\n\n`;
+                q.options.forEach((option, i) => {
+                    textContent += `   ${i === q.answer ? '->' : '  '} (${letters[i]}) ${option}\n`;
+                });
+                textContent += `\n`;
+            });
+
+            downloadFile(textContent, 'gabarito_simulado_ti.txt', 'text/plain');
+        }
+
+        function exportScore() {
+            const totalQuestions = quizData.length;
+            const percentage = ((score / totalQuestions) * 100).toFixed(1);
+            let textContent = `Resultado do Simulado - Assistente de TI\n\n`;
+            textContent += `Pontuação: ${score} de ${totalQuestions}\n`;
+            textContent += `Percentual de acerto: ${percentage}%\n`;
+
+            downloadFile(textContent, 'pontuacao_simulado_ti.txt', 'text/plain');
+        }
+
+
+        function downloadFile(content, fileName, contentType) {
+            const a = document.createElement("a");
+            const file = new Blob([content], { type: contentType });
+            a.href = URL.createObjectURL(file);
+            a.download = fileName;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
+
+        submitBtn.addEventListener('click', showResults);
+        exportQuestionsBtn.addEventListener('click', exportQuestions);
+        exportScoreBtn.addEventListener('click', exportScore);
+
+        // Render the quiz on page load
+        renderQuiz();
+    </script>
+
+</body>
+</html>
