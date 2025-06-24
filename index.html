@@ -50,6 +50,9 @@
                 <button id="export-score-btn" class="w-full sm:w-auto bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition-colors duration-300">
                     Exportar Pontuação
                 </button>
+                <button id="restart-btn" class="w-full sm:w-auto bg-gray-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 transition-colors duration-300">
+                    Reiniciar Teste
+                </button>
             </div>
         </div>
     </div>
@@ -247,10 +250,15 @@
         const exportButtons = document.getElementById('export-buttons');
         const exportQuestionsBtn = document.getElementById('export-questions-btn');
         const exportScoreBtn = document.getElementById('export-score-btn');
+        const restartBtn = document.getElementById('restart-btn'); // Get the new restart button
         let currentCategory = "";
         let score = 0;
+        let answeredQuestionsCount = 0; // Nova variável para contar apenas perguntas respondidas
 
         function renderQuiz() {
+            // Clear previous questions if any
+            quizForm.innerHTML = ''; 
+            currentCategory = ""; // Reset current category for rendering
             const letters = ['A', 'B', 'C', 'D'];
             quizData.forEach((q, index) => {
                 if(q.category !== currentCategory) {
@@ -299,6 +307,7 @@
 
         function calculateScore() {
             score = 0;
+            answeredQuestionsCount = 0; // Reinicia a contagem de perguntas respondidas
             const radioInputs = document.querySelectorAll('input[type="radio"]');
             
             quizData.forEach((q, index) => {
@@ -307,6 +316,7 @@
                 const labels = questionBlock.querySelectorAll('label');
 
                 if (selectedOption) {
+                    answeredQuestionsCount++; // Incrementa apenas se houver uma seleção
                     const selectedAnswer = parseInt(selectedOption.value);
                     const selectedLabel = selectedOption.nextElementSibling;
 
@@ -330,10 +340,11 @@
 
         function showResults() {
             calculateScore();
-            const totalQuestions = quizData.length;
-            const percentage = ((score / totalQuestions) * 100).toFixed(1);
+            // Usa answeredQuestionsCount em vez de quizData.length
+            const totalQuestionsForScore = answeredQuestionsCount; 
+            const percentage = (totalQuestionsForScore > 0) ? ((score / totalQuestionsForScore) * 100).toFixed(1) : (0).toFixed(1); // Handle division by zero
 
-            scoreDisplay.innerHTML = `Sua pontuação: <span class="text-indigo-600">${score} de ${totalQuestions}</span> (${percentage}%)`;
+            scoreDisplay.innerHTML = `Sua pontuação: <span class="text-indigo-600">${score} de ${totalQuestionsForScore}</span> (${percentage}%)`;
             scoreDisplay.classList.remove('hidden');
             exportButtons.classList.remove('hidden');
             submitBtn.style.display = 'none'; // Hide the submit button
@@ -357,8 +368,9 @@
         }
 
         function exportScore() {
-            const totalQuestions = quizData.length;
-            const percentage = ((score / totalQuestions) * 100).toFixed(1);
+            // Usa answeredQuestionsCount para o total de perguntas consideradas
+            const totalQuestions = answeredQuestionsCount; 
+            const percentage = (totalQuestions > 0) ? ((score / totalQuestions) * 100).toFixed(1) : (0).toFixed(1); // Handle division by zero
             let textContent = `Resultado do Simulado - Assistente de TI\n\n`;
             textContent += `Pontuação: ${score} de ${totalQuestions}\n`;
             textContent += `Percentual de acerto: ${percentage}%\n`;
@@ -376,10 +388,44 @@
             URL.revokeObjectURL(a.href);
         }
 
+        function restartQuiz() {
+            // Reset scores and counters
+            score = 0;
+            answeredQuestionsCount = 0;
+
+            // Clear selected radio buttons and remove styling
+            const allRadioInputs = document.querySelectorAll('input[type="radio"]');
+            allRadioInputs.forEach(input => {
+                input.checked = false; // Uncheck all radio buttons
+                input.disabled = false; // Re-enable all radio buttons
+                const parentDiv = input.parentElement;
+                parentDiv.classList.remove('correct-answer', 'wrong-answer');
+            });
+
+            const questionBlocks = document.querySelectorAll('.question-block');
+            questionBlocks.forEach(block => {
+                block.classList.remove('no-selection');
+                // Remove styling from correct answers too, if it was added by previous showResults
+                block.querySelectorAll('label').forEach(label => {
+                    label.parentElement.classList.remove('correct-answer', 'wrong-answer');
+                });
+            });
+
+
+            // Hide results and export buttons, show submit button
+            scoreDisplay.classList.add('hidden');
+            exportButtons.classList.add('hidden');
+            submitBtn.style.display = 'block'; // Show the submit button
+
+            // Re-render the quiz (optional, if you want to ensure a clean state, but clearing classes is usually enough)
+            renderQuiz();
+        }
+
 
         submitBtn.addEventListener('click', showResults);
         exportQuestionsBtn.addEventListener('click', exportQuestions);
         exportScoreBtn.addEventListener('click', exportScore);
+        restartBtn.addEventListener('click', restartQuiz); // Add event listener for restart button
 
         // Render the quiz on page load
         renderQuiz();
